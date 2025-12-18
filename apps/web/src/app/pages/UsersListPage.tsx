@@ -11,6 +11,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { CreateUserInput, UpdateUserInput } from '@/features/users/api';
 
 export function UsersListPage() {
@@ -20,6 +29,7 @@ export function UsersListPage() {
   const createUser = useCreateUser();
   const [assigningPolicy, setAssigningPolicy] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [errorDialog, setErrorDialog] = useState<{ open: boolean; message: string }>({ open: false, message: '' });
 
   const handleAssignPolicy = async (userId: string, policyId: string) => {
     try {
@@ -27,7 +37,7 @@ export function UsersListPage() {
       await assignPolicy.mutateAsync({ userId, policyId });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to assign policy';
-      alert(message);
+      setErrorDialog({ open: true, message });
     } finally {
       setAssigningPolicy(null);
     }
@@ -82,6 +92,21 @@ export function UsersListPage() {
           />
         </DialogContent>
       </Dialog>
+      <AlertDialog open={errorDialog.open} onOpenChange={(open) => setErrorDialog({ open, message: errorDialog.message })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Error</AlertDialogTitle>
+            <AlertDialogDescription>
+              {errorDialog.message}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setErrorDialog({ open: false, message: '' })}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

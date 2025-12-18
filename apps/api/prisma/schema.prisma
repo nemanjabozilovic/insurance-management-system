@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String         @id @default(uuid())
+  username       String         @unique
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime
+  address        String
+  phoneNumber    String
+  email          String         @unique
+  profileImageUrl String?
+  policies       UserPolicy[]
+
+  @@map("users")
+}
+
+model Policy {
+  id              String       @id @default(uuid())
+  name            String       @unique
+  shortDescription String
+  monthlyPremium  Decimal      @db.Decimal(10, 2)
+  users           UserPolicy[]
+
+  @@map("policies")
+}
+
+model UserPolicy {
+  id        String   @id @default(uuid())
+  userId    String
+  policyId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  policy    Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, policyId])
+  @@map("user_policies")
+}

@@ -17,7 +17,9 @@ COPY apps/web/postcss.config.js apps/web/
 
 WORKDIR /app/apps/web
 
-EXPOSE 5174
+ARG WEB_PORT=4886
+ENV WEB_PORT=${WEB_PORT}
+EXPOSE 4886
 
 CMD ["npm", "run", "dev", "--", "--host"]
 

@@ -35,13 +35,19 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      args:
+        API_PORT: 6318
     container_name: insurance-management-api
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-insurance_management}
       NODE_ENV: development
-      PORT: 3002
+      PORT: 6318
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER:-postgres}
+      PGDATABASE: ${POSTGRES_DB:-insurance_management}
     ports:
-      - "3002:3002"
+      - "6318:6318"
     depends_on:
       db:
         condition: service_healthy
@@ -56,11 +62,13 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        WEB_PORT: 4886
     container_name: insurance-management-web
     environment:
-      VITE_API_URL: http://localhost:3002
+      VITE_API_URL: http://localhost:6318
     ports:
-      - "5174:5174"
+      - "4886:4886"
     depends_on:
       - api
     volumes:
